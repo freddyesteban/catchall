@@ -3,7 +3,7 @@ package catchall_test
 import (
 	"testing"
 
-	"github.com/mailgun/catchall"
+	"github.com/freddyesteban/catchall"
 )
 
 func BenchmarkEventBus(b *testing.B) {
