@@ -36,10 +36,17 @@ func (mdb *MongoDB) Connect() (err error) {
 
 	mdb.Client, err = mongo.Connect(mdb.ctx, mdb.options)
 	if err != nil {
+		mdb.log.Error("Error connecting to mongodb: ", err.Error())
 		return
 	}
 	err = mdb.Client.Ping(ctx, nil)
 	return
+}
+
+func (mdb *MongoDB) Disconnect() {
+	if err := mdb.Client.Disconnect(mdb.ctx); err != nil {
+		mdb.log.Error("Error disconnecting from mongodb: ", err.Error())
+	}
 }
 
 func (mdb *MongoDB) Query() error {

@@ -19,6 +19,9 @@ func main() {
 	//if err != nil {
 	//	logger.Fatal(err)
 	//}
+	//// It is best practice to keep a client that is connected to MongoDB around so that the application can
+	//// make use of connection pooling, you don't want to open and close a connection for each query.
+	//defer db.Disconnect()
 
 	newApi := api.NewApi(db, logger)
 	newApi.Run()
