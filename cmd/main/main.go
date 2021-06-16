@@ -24,6 +24,7 @@ func main() {
 	//defer db.Disconnect()
 
 	newApi := api.NewApi(db, logger)
+	newApi.RegisterRoutes()
 	newApi.Run()
 }
 

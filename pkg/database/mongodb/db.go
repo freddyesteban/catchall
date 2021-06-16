@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,6 +15,7 @@ type MongoDB struct {
 	options *options.ClientOptions
 	log     *logrus.Entry
 	ctx     context.Context
+	dbName  string
 }
 
 func NewMongoDB(ctx context.Context, uri string, log *logrus.Logger) (database *MongoDB) {
@@ -24,6 +26,7 @@ func NewMongoDB(ctx context.Context, uri string, log *logrus.Logger) (database *
 		log:     logger,
 		options: options.Client().ApplyURI(uri),
 		ctx:     ctx,
+		dbName:  "catchall",
 	}
 
 	return
@@ -37,10 +40,10 @@ func (mdb *MongoDB) Connect() (err error) {
 	mdb.Client, err = mongo.Connect(mdb.ctx, mdb.options)
 	if err != nil {
 		mdb.log.Error("Error connecting to mongodb: ", err.Error())
-		return
+		return err
 	}
 	err = mdb.Client.Ping(ctx, nil)
-	return
+	return nil
 }
 
 func (mdb *MongoDB) Disconnect() {
@@ -51,4 +54,23 @@ func (mdb *MongoDB) Disconnect() {
 
 func (mdb *MongoDB) Query() error {
 	return nil
+}
+
+func (mdb *MongoDB) InsertEvent(event Event) (err error) {
+	mdb.log.Debug(fmt.Sprintf("Inserting event %v", event))
+	ctx, cancel := context.WithTimeout(mdb.ctx, 10*time.Second)
+	defer cancel()
+
+	collection := mdb.eventsCollection()
+	result, err := collection.InsertOne(ctx, event)
+	if err != nil {
+		mdb.log.Error("Error inserting event: ", err.Error())
+		return err
+	}
+	mdb.log.Info("Inserted single event document: ", result.InsertedID)
+	return nil
+}
+
+func (mdb *MongoDB) eventsCollection() *mongo.Collection {
+	return mdb.Client.Database(mdb.dbName).Collection("events")
 }

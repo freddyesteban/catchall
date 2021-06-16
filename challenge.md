@@ -23,8 +23,10 @@ become unusable.
 Your code challenge, should you choose to accept it, is to build a distributed system that
 identifies these catch-all domains by counting `delivered` and `bounced` events provided to
 your application through the following endpoints (think of them as webhooks):
-PUT /events/<domain_name>/delivered - receives an event of type “delivered”.
-PUT /events/<domain_name>/bounced - receives an event of type “bounced”.
+
+    PUT /events/<domain_name>/delivered - receives an event of type “delivered”.
+    PUT /events/<domain_name>/bounced - receives an event of type “bounced”.
+
 For this challenge the testing events can be generated using a simple script.
 A domain name can be considered a catch-all when it receives more than 1000 “delivered”
 events. If a domain name receives less than 1000 “delivered” events it’s considered “unknown”
